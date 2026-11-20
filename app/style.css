@@ -1,7 +1,265 @@
-body { font-family: Arial, sans-serif; margin: 24px; color: #222; }
-header { display: flex; justify-content: space-between; align-items: baseline; }
-.controls { display: flex; gap: 16px; margin: 12px 0; align-items: center; }
-.import input { font-size: 12px; }
-table { border-collapse: collapse; width: 100%; }
-th, td { border-bottom: 1px solid #ddd; padding: 6px 8px; text-align: left; vertical-align: top; white-space: pre-line; }
-th { background: #f2f2f2; }
+/* The Leonida trophy guide — dark neon-noir, one accent, grade colors carry meaning only.
+   Tokens: one tinted neutral ramp, one accent (neon pink), semantic grade ramps. */
+@font-face {
+  font-family: "Archivo";
+  src: url("fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0f0e12;
+  --bg-surface: #17161c;
+  --bg-raised: #1e1d25;
+  --bg-sunken: #0b0a0e;
+  --border: rgb(242 239 233 / 0.09);
+  --border-strong: rgb(242 239 233 / 0.16);
+  --text: #f2efe9;
+  --text-secondary: #b7b3a9;
+  --text-muted: #8b877e;
+  --accent: #ff5c8a;
+  --accent-fill: #ff3e7a;
+  --accent-ink: #1c050d;
+  --accent-soft: rgb(255 92 138 / 0.12);
+  --gold: #e8b33c;
+  --silver: #c7cbd1;
+  --bronze: #c08a5a;
+  --platinum: #edeae2;
+  --good: #4cc38a;
+  --warn: #e8b33c;
+  --bad: #ff5a4e;
+  --radius-card: 14px;
+  --radius-control: 8px;
+  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.28);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+h1, h2, h3 { font-family: "Archivo", "Inter", sans-serif; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.01em; }
+h3 { font-size: 1.125rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); text-decoration-thickness: from-font; text-underline-offset: 3px; }
+a:hover { color: #ff7ba3; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Hero */
+.hero { border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #171320 0%, var(--bg) 100%); }
+.hero-inner {
+  max-width: 1200px; margin: 0 auto; padding: 40px 24px 32px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start;
+}
+.eyebrow {
+  font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.05em; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.lede { color: var(--text-secondary); font-size: 1.0625rem; max-width: 62ch; margin-top: 12px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 24px 0 0; padding: 0; }
+.facts div { display: flex; gap: 8px; align-items: baseline; }
+.facts dt { color: var(--text-muted); font-size: 0.8125rem; }
+.facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Progress card */
+.progress-card {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 20px; box-shadow: var(--shadow-card); position: sticky; top: 16px;
+  display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 16px; align-items: center;
+}
+.ring { width: 120px; height: 120px; }
+.ring-track { fill: none; stroke: #2b2a33; stroke-width: 9; }
+.ring-value {
+  fill: none; stroke: var(--accent-fill); stroke-width: 9; stroke-linecap: round;
+  stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
+  transform: rotate(-90deg); transform-origin: 60px 60px;
+  transition: stroke-dashoffset 0.4s ease;
+}
+.progress-count { font-family: "Archivo", sans-serif; font-size: 2rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.progress-count .of { color: var(--text-muted); font-size: 1.25rem; font-weight: 600; }
+.progress-label { color: var(--text-secondary); font-size: 0.875rem; }
+.progress-grades { color: var(--text-muted); font-size: 0.8125rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.saved { grid-column: 1 / -1; color: var(--good); font-size: 0.8125rem; margin-top: 8px; }
+.saved::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--good); margin-right: 7px; }
+.progress-actions { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.btn {
+  appearance: none; border: 1px solid var(--border-strong); background: var(--bg-raised);
+  border-radius: var(--radius-control); padding: 8px 12px; font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; text-decoration: none; display: inline-block;
+}
+.btn:hover { border-color: var(--text-muted); }
+.btn-quiet { background: transparent; }
+.import-label input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+
+/* Main sections */
+main { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+section { padding: 32px 0; border-bottom: 1px solid var(--border); }
+.section-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.section-head h2 { flex: none; }
+.section-note { color: var(--text-secondary); font-size: 0.9375rem; max-width: 72ch; }
+
+/* Roadmap stages */
+.stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: stage; }
+.stages li {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 20px; display: flex; flex-direction: column; gap: 8px; cursor: pointer;
+}
+.stages li:hover { border-color: var(--border-strong); }
+.stages li.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.stage-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.stage-num { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 0.8125rem; color: var(--accent); letter-spacing: 0.05em; }
+.stage-hours { font-size: 0.8125rem; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stages h3 { font-size: 1.0625rem; }
+.stages p { color: var(--text-secondary); font-size: 0.9375rem; }
+.stages .stage-link { margin-top: auto; padding-top: 8px; color: var(--accent); font-size: 0.875rem; font-weight: 600; }
+.roadmap-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.roadmap-notes p { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text-secondary); font-size: 0.9375rem; }
+.roadmap-notes strong { color: var(--text); }
+
+/* 100% checklist counters */
+.checklist { margin-top: 28px; }
+.checklist h3 { margin-bottom: 8px; }
+.checklist-lines { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.checklist-lines li {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+}
+.checklist-lines .line-name { flex: 1; min-width: 0; font-size: 0.9375rem; }
+.checklist-lines .line-count { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.checklist-lines .line-count .need { color: var(--text-muted); font-weight: 400; }
+.stepper { display: flex; gap: 4px; }
+.stepper button {
+  width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-strong);
+  background: var(--bg-raised); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0;
+}
+.stepper button:hover { border-color: var(--text-muted); }
+.stepper button:disabled { opacity: 0.35; cursor: default; }
+
+/* Toolbar */
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 12px 16px; margin-bottom: 16px; position: sticky; top: 12px; z-index: 5;
+}
+.search-label { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-muted); }
+.search-label input {
+  width: 220px; background: var(--bg-sunken); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control); padding: 8px 10px; font-size: 1rem; color: var(--text);
+}
+.search-label input::placeholder { color: var(--text-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-btn {
+  border: 1px solid var(--border-strong); background: transparent; border-radius: 999px;
+  padding: 6px 12px; font-size: 0.875rem; cursor: pointer; color: var(--text-secondary);
+}
+.chip-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.chip-btn[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--accent-ink); font-weight: 600; }
+.select-label { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-muted); margin-left: auto; }
+.select-label select {
+  background: var(--bg-sunken); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control); padding: 8px 10px; font-size: 0.875rem; cursor: pointer;
+}
+.switch { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-secondary); cursor: pointer; }
+.switch input { width: 18px; height: 18px; accent-color: var(--accent-fill); cursor: pointer; }
+
+/* Trophy list */
+.list { display: grid; gap: 12px; }
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 16px 20px; display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto; gap: 4px 16px; align-items: start;
+}
+.card.earned { border-color: rgb(76 195 138 / 0.45); }
+.card.earned .trophy-name::after {
+  content: "Earned"; margin-left: 10px; font-size: 0.75rem; font-weight: 600; color: var(--good);
+  vertical-align: 2px; letter-spacing: 0.03em;
+}
+.medallion { width: 56px; height: 56px; grid-row: span 2; }
+.medallion svg { width: 100%; height: 100%; display: block; }
+.card-body { min-width: 0; }
+.card-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.case-no { font-family: "Archivo", sans-serif; font-size: 0.8125rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.trophy-name { font-family: "Archivo", sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
+.trophy-desc { color: var(--text-secondary); font-size: 0.9375rem; margin-top: 2px; }
+.trophy-guide { margin-top: 10px; font-size: 0.9375rem; max-width: 72ch; text-wrap: pretty; }
+.trophy-guide strong { color: var(--text); }
+.target-bar { margin-top: 12px; max-width: 420px; }
+.target-bar .target-label { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--text-muted); font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+.target-track { height: 6px; border-radius: 3px; background: var(--bg-raised); overflow: hidden; }
+.target-fill { height: 100%; border-radius: 3px; background: var(--accent-fill); }
+.card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+.chip {
+  display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+  border: 1px solid var(--border-strong); border-radius: 999px; padding: 3px 9px; color: var(--text-secondary);
+  white-space: nowrap;
+}
+.chip-grade-platinum { color: var(--platinum); border-color: rgb(237 234 226 / 0.4); }
+.chip-grade-gold { color: var(--gold); border-color: rgb(232 179 60 / 0.4); }
+.chip-grade-silver { color: var(--silver); border-color: rgb(199 203 209 / 0.4); }
+.chip-grade-bronze { color: var(--bronze); border-color: rgb(192 138 90 / 0.4); }
+.chip-missable { color: var(--bad); border-color: rgb(255 90 78 / 0.45); }
+.chip-confirmed { color: var(--good); border-color: rgb(76 195 138 / 0.4); }
+.chip-disputed { color: var(--warn); border-color: rgb(232 179 60 / 0.4); }
+.chip-unconfirmed { color: var(--text-muted); border-color: var(--border-strong); }
+.source { font-size: 0.8125rem; color: var(--text-muted); }
+.source a { color: var(--text-muted); }
+.trophy-note { margin-top: 8px; font-size: 0.875rem; color: var(--warn); }
+.earned-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text-secondary); white-space: nowrap; }
+.earned-toggle input { width: 20px; height: 20px; accent-color: var(--good); cursor: pointer; }
+.card-detail { grid-column: 1 / -1; }
+.empty { color: var(--text-secondary); padding: 24px; text-align: center; }
+
+/* Audit */
+.audit-list { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 12px; }
+.audit-list li { background: var(--bg-surface); border: 1px solid var(--border); border-left: 3px solid var(--warn); border-radius: 0 12px 12px 0; padding: 14px 18px; }
+.audit-list li:first-child { border-left-color: var(--accent); }
+.audit-list h3 { font-size: 1rem; margin-bottom: 4px; }
+.audit-list p { color: var(--text-secondary); font-size: 0.9375rem; }
+.audit h3 { margin: 24px 0 12px; }
+.confidence-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.confidence-legend li { display: flex; gap: 12px; align-items: baseline; color: var(--text-secondary); font-size: 0.9375rem; }
+.confidence-legend .chip { flex: none; }
+.source-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.source-list li { font-size: 0.9375rem; color: var(--text-secondary); }
+.source-list a { color: var(--text); }
+
+/* Footer */
+footer { max-width: 1200px; margin: 0 auto; padding: 28px 24px 40px; color: var(--text-muted); font-size: 0.875rem; display: grid; gap: 8px; }
+.footer-meta { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .progress-card { position: static; }
+  .stages { grid-template-columns: 1fr; }
+  .roadmap-notes { grid-template-columns: 1fr; }
+  .checklist-lines { grid-template-columns: 1fr; }
+  h1 { font-size: 2rem; }
+}
+@media (max-width: 640px) {
+  .card { grid-template-columns: 44px minmax(0, 1fr); }
+  .medallion { width: 44px; height: 44px; }
+  .earned-toggle { grid-column: 2; }
+  .search-label input { width: 100%; }
+  .search-label { flex: 1; }
+  .select-label { margin-left: 0; }
+}
+@media (hover: hover) {
+  .card:hover { border-color: var(--border-strong); }
+  .stages li:hover { border-color: var(--border-strong); }
+}
